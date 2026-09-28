@@ -32,31 +32,77 @@ maryland_expenses <- read_csv("data/maryland_expenses.csv")
 
 ## Answer questions
 
-**Q1.** How many departments have offered the courses with "Climate" in the title and at least one seat? Which department has offered the most? **A1.**
+**Q1.** How many departments have offered the courses with "Climate" in the title and at least one seat? Which department has offered the most? **A1. 32 departments offer courses with "Climate" in the title and at least one seat. Atmospheric and Oceanic Science offers the most.**
 
 ```{r}
+climate_courses <- umd_courses |>
+  group_by (department) |>
+  filter(str_detect(title, "Climate")) |> filter(seats >= 1) |>
+  summarise(word_climate = n()) |>
+  arrange(desc(word_climate)) 
+
+
 ```
 
 **Q2.** Of the departments listed in A1, which one is the most interesting to you, and why? **A2.**
 
+Finance, I'm curious what climate courses are offered in that department.
+
 **Q3** Which departments offered the most courses in the Fall 2024 term? And which departments in that term have at least one syllabus posted? Answer both of those questions and then compare the top five departments - how are they different?
 
-**A3.**
+**A3. Business and management offer the most courses, 133 depts have at least one syllabus. The top 5 depts are: business, econ, music, IS, and engineering. Music is the odd man out.**
 
 ```{r}
+fall_2024 <- umd_courses |> 
+  group_by(department) |>
+  filter (term == 202408 & syllabus_count >= 1) |> summarise(fall_2024 =n()) |>
+    arrange(desc(department)) 
 ```
 
 **Q4.** Using the Maryland campaign expenses data, change the datatype of the expenditure_date column so that it is a date and not a chr, saving the result as a new dataframe. Then create a new column for the month based on expenditure_date. Then write code that shows total amount spent each month by Wes Moore's committee (you'll need to search the data to find the exact name, and we're not looking in payee_name). Write a sentence describing the pattern of spending over time. **A4.**
 
 ```{r}
+wes_moore <- maryland_expenses |>
+  mutate (expenditure_date = mdy(expenditure_date))|>
+  mutate(month = floor_date(expenditure_date, "month")) |>
+  filter(str_detect(committee_name, "Wes For")) |>
+  select(payee_name, committee_name, month, amount) |>
+  group_by(month) |>
+  summarise(total_donations = sum(amount))
 ```
 
 **Q5.** Using case_when(), create a column in the Maryland expenses data called `spending_location` indicating whether each record spent money in Maryland or outside Maryland. For records that are in Maryland, make the new column's value "In-state" and for all others, make it "Out of state". Then write code that shows the total amount of money spent in each category and describe the results. You can do this in one statement or break it up into two statements (saving the new column to your dataframe). **A5**
 
 ```{r}
+  maryland_expenses |>
+    mutate(
+      spending_location = case_when( 
+        str_detect(address, " Maryland ") ~ "In-state",
+        str_detect(address, " California ") ~ "Out of State",
+        str_detect(address, " Washington ") ~ "Out of State",
+        str_detect(address, " Louisiana ") ~ "Out of State",
+        str_detect(address, " Florida ") ~ "Out of State",
+        str_detect(address, " North Carolina ") ~ "Out of State",
+        str_detect(address, " Massachusetts ") ~ "Out of State",
+        str_detect(address, " West Virginia ") ~ "Out of State",
+        str_detect(address, " Virginia ") ~ "Out of State",
+        .default = NA
+      )
+    ) |>
+    group_by(spending_location) |> 
+    summarise(
+      total_amount = sum(amount)
+    ) |> 
+    arrange(desc(total_amount))
 ```
 
-**Q6.** Choose your own adventure: using either the UMD courses or campaign expenses data, ask and answer a question that is different than the previous ones. You can use one of the ones you provided in the pre_lab. **A6.**
+**Q6.** Choose your own adventure: using either the UMD courses or campaign expenses data, ask and answer a question that is different than the previous ones. You can use one of the ones you provided in the pre_lab. **A6. Taken from pre-lab, how many classes with the word "dance" were offered in 2025?**
 
 ```{r}
+umd_courses |>
+  group_by (department) |>
+  filter(str_detect(title, "Dance")) |> filter( term == 202500 & seats >= 1) |>
+  summarise(word_dance_202500 = n()) |>
+  arrange(desc(word_dance_202500)) 
+
 ```

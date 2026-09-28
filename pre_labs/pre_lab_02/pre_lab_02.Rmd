@@ -197,7 +197,7 @@ maryland_expenses |>
   mutate(month = floor_date(expenditure_date, "month")) |>
   group_by(month) |>
   summarise(total_amount = sum(amount)) |>
-  arrange(desc(total_amount))
+ arrange(desc(total_amount)) 
 ```
 
 So the month of June 2022 had the most expenditures by far in this data.
