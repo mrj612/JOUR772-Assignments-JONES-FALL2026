@@ -33,15 +33,16 @@ library(tidyverse)
 
 ### Task 2: Load data
 
-**Task** Load some [Maryland state government payments data](https://opendata.maryland.gov/Budget/State-of-Maryland-Payments-Data-FY2008-to-FY2024/7syw-q4cy) by running the following code. We'll use the guess_max() function as an argument to use the first 10 rows to set the data type. What does the first line of the red Warning message that prints out when you load the data say? What happens when you follow its instructions? Answer below. **Answer**
+**Task** Load some [Maryland state government payments data](https://opendata.maryland.gov/Budget/State-of-Maryland-Payments-Data-FY2008-to-FY2024/7syw-q4cy) by running the following code. We'll use the guess_max() function as an argument to use the first 10 rows to set the data type. What does the first line of the red Warning message that prints out when you load the data say? What happens when you follow its instructions? Answer below. **Answer** It says **"**One or more parsing issues, call \`problems()\` on your data frame for details, e.g.:" I don't understand what it is asking me to do.
 
 ```{r}
 payments <- read_csv("data/State_of_Maryland_Payments_Data__FY2008_to_FY2024_20250115.csv", guess_max=10)
+
 ```
 
 ### Task 3: Reload data
 
-**Task** Run the following codeblock to reload the data, using every row to set the data types. Does it show any parsing errors when you run? Answer below **Answer**
+**Task** Run the following codeblock to reload the data, using every row to set the data types. Does it show any parsing errors when you run? Answer below **Answer I don't think so, but its not loading.**
 
 ```{r}
 payments <- read_csv("data/State_of_Maryland_Payments_Data__FY2008_to_FY2024_20250115.csv", guess_max=369008)
@@ -49,7 +50,7 @@ payments <- read_csv("data/State_of_Maryland_Payments_Data__FY2008_to_FY2024_202
 
 ### Task 4: Examine the data with glimpse
 
-**Task** Run the following codeblock to glimpse the data. What data type is the "Vendor Name" field? What data type is the "Amount" field? What data type is the "Date" column? Answer below. **Answer**
+**Task** Run the following codeblock to glimpse the data. What data type is the "Vendor Name" field? What data type is the "Amount" field? What data type is the "Date" column? Answer below. **Answer Vendor Name and Date are chr and Amount are dbl.**
 
 ```{r}
 glimpse(payments)
