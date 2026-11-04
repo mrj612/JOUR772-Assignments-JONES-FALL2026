@@ -38,15 +38,14 @@ In this section, describe the source of the data, write a basic data dictionary 
 
 ```{r}
 # Load required data
-cleaned_data <- read_csv("data/homicide-data.csv") |>
-  clean_names()
-
+homicide_data <- read_csv("data/homicide-data.csv", locale = readr::locale(encoding = "Latin1"))
 
 # Path to data should be loaded from folder "data" i.e. read_csv("data/name_of_data.csv")
 
 # Clean required data and prepare for analysis if needed. 
 
-
+cleaned_up_homicide_data <- homicide_data |>
+  clean_names()
 ```
 
 ## Sentences to Engineer
@@ -59,23 +58,31 @@ In this notebook, we are reverse engineering five sentences from the story.
 - **Analysis summary**:
 
 ```{r}
-# Put code to reverse engineer sentence here
+homicide_with_cw <- cleaned_up_homicide_data|>
+  mutate(reported_date = ymd(reported_date)) |>
+  mutate(bmore_since_2014 = case_when(
+    state == "MD" & reported_date >= "2015-01-01" ~ "post-2015",
+    .default = "pre-2015"
+  ))
 
-# Display results of code below this codeblock
+homicide_with_cw |>
+  filter(bmore_since_2014 == "post-2015") |>
+  summarise(total_uids = n()) / (365*3)
 
 ```
 
 ### Sentence 2
 
-- **Sentence text**: Of 50 of the nation’s largest cities, Baltimore is one of 34 where police now make homicide arrests less often than in 2014, according to a Washington Post analysis. In Chicago, the homicide arrest rate has dropped 21 percentage points, in Boston it has dropped 12 points and in St. Louis it is down 9. 
+- **Sentence text**: Of 50 of the nation’s largest cities, Baltimore is one of 34 where police now make homicide arrests less often than in 2014, according to a Washington Post analysis. In Chicago, the homicide arrest rate has dropped 21 percentage points,in Boston it has dropped 12 points and in St. Louis it is down 9. 
 - **Analysis summary**: [Write up two to three sentences describing the results of your analysis. Were you able to confirm the finding? If not, why not?]
 
-```{r}
-# Put code to reverse engineer sentence here
+1.  ::: {}
+    ```{r}
 
-# Display results of code below this codeblock
+                
 
-```
+    ```
+    :::
 
 ### Sentence 3
 
@@ -83,9 +90,11 @@ In this notebook, we are reverse engineering five sentences from the story.
 - **Analysis summary**: [Write up two to three sentences describing the results of your analysis. Were you able to confirm the finding? If not, why not?]
 
 ```{r}
-# Put code to reverse engineer sentence here
-
-# Display results of code below this codeblock
+cleaned_up_homicide_data |>
+  mutate(reported_date = ymd(reported_date)) |> mutate(reported_year = floor_date(reported_date, "year")) |>
+  group_by(city, reported_year) |>
+  summarise(total_uids = n()) |>
+  arrange(city, reported_year)
 
 ```
 
@@ -107,9 +116,11 @@ In this notebook, we are reverse engineering five sentences from the story.
 - **Analysis summary**: [Write up two to three sentences describing the results of your analysis. Were you able to confirm the finding? If not, why not?]
 
 ```{r}
-# Put code to reverse engineer sentence here
-
-# Display results of code below this codeblock
+cleaned_up_homicide_data |> filter(state == "MD") |> 
+  mutate(reported_date = ymd(reported_date)) |>  filter(reported_date >= ymd("2015-01-01") & reported_date < ymd("2026-01-01")) |>
+  group_by(disposition) |>
+  summarise(total_uids = n()) |>
+  arrange(desc(total_uids))
 
 ```
 
