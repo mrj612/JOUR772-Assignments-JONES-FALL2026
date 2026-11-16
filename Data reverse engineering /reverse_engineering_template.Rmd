@@ -79,8 +79,27 @@ homicide_with_cw |>
 1.  ::: {}
     ```{r}
 
-                
+    rates_2014 <- city_arrest_rates |>
+      filter(year == 2014) |>
+      select(city, state, rates_2014 = arrest_rate)
 
+    rates_2017 <- city_arrest_rates |>
+      filter(year == 2017) |>
+      select(city, state, rates_2017 = arrest_rate)
+
+    city_comparison <- rates_2014 |>
+      inner_join(rates_2017, by = c("city", "state")) |>
+      mutate(
+        percentage_point_drop = rates_2014 - rates_2017
+      ) |>
+      arrange(desc(percentage_point_drop))
+    city_comparison |>
+      summarise(
+        cities_with_decline = sum(percentage_point_drop > 0)
+      )
+
+    city_comparison |>
+      filter(city == "Chicago" | city == "Boston" | city == "St. Louis" | city == "Baltimore"| city == "Albuquerque"| city == "Atlanta"| city == "Baton Rouge" | city == "Birmingham" | city == "Buffalo"| city == "Charlotte"| city == "Cincinnati"|city == "Columbus"|city == "Dallas"| city == "Denver"|city == "Detroit"|city == "Durham"|city == "Fort Worth"|city == "Fresno"|city == "Houston"|city == "Indianapolis"|city == "Jacksonville"|city == "Kansas City"|city == "Las Vegas"|city == "Long Beach"|city == "Los Angeles"|city == "Louisville"|city == "Memphis"|city == "Miami"|city == "Milwaukee"|city == "Minneapolis"|city == "Nashville"|city == "New Orleans"|city == "New York"|city == "Oakland"|city == "Oklahoma City"|city == "Omaha"|city == "Philadelphia"|city == "Phoenix"|city == "Pittsburgh"|city == "Richmond"|city == "Sacremento"|city == "San Antonio"|city == "San Bernardino"|city == "San Diego"|city == "San Francisco"|city == "Savannah"|city == "Stockton"|city == "Tampa"|city == "Tulsa"|city == "Washington")
     ```
     :::
 
@@ -104,9 +123,49 @@ cleaned_up_homicide_data |>
 - **Analysis summary**: [Write up two to three sentences describing the results of your analysis. Were you able to confirm the finding? If not, why not?]
 
 ```{r}
-# Put code to reverse engineer sentence here
+homicide_with_year <- cleaned_up_homicide_data |>
+  mutate(reported_date = ymd(as.character(reported_date))) |>
+  mutate(year = year(reported_date))
+baltimore_arrest_rates <- homicide_with_year |>
+  filter(city == "Baltimore", state == "MD") |>
+  group_by(year) |>
+  summarise(
+    total_homicides = n(),
+    arrests = sum(disposition == "Closed by arrest")
+  ) |>
+  mutate(
+    arrest_rate = arrests / total_homicides * 100
+  )
+baltimore_arrest_rates |>
+  filter(year == 2014 | year == 2015)
 
-# Display results of code below this codeblock
+city_arrest_rates <- homicide_with_year |>
+  group_by(city, state, year) |>
+  summarise(
+    total_homicides = n(),
+    arrests = sum(disposition == "Closed by arrest"),
+    .groups = "drop"
+  ) |>
+  mutate(
+    arrest_rate = arrests / total_homicides * 100
+  )
+rates_2014 <- city_arrest_rates |>
+  filter(year == 2014) |>
+  select(city, state, rate_2014 = arrest_rate)
+
+rates_2015 <- city_arrest_rates |>
+  filter(year == 2015) |>
+  select(city, state, rate_2015 = arrest_rate)
+
+city_comparison <- rates_2014 |>
+  inner_join(rates_2015, by = c("city", "state")) |>
+  filter(rate_2014 < 50) |>
+  mutate(
+    percentage_point_drop = rate_2014 - rate_2015
+  ) |>
+  arrange(desc(percentage_point_drop))
+
+
 
 ```
 
